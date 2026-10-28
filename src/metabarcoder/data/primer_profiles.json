@@ -1,0 +1,16 @@
+[
+  {
+    "id": "cytb_l15601_h15748",
+    "name": "CYTB forensic mini-barcode L15601/H15748",
+    "marker": "MT-CYB",
+    "forward_primer": "TACGCAATCCTACGATCAATTCC",
+    "reverse_primer": "GGTTGTCCTCCAATTCATGTTAG",
+    "min_insert_bp": 125,
+    "max_insert_bp": 175,
+    "expected_insert_bp": 148,
+    "max_primer_error_rate": 0.15,
+    "taxonomic_scope": ["Mammalia", "Aves", "Reptilia", "Actinopterygii", "Malacostraca"],
+    "doi": "10.1016/j.fsigen.2016.05.001"
+  }
+]
+

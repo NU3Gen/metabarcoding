@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="sk">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nanopore Metabarcoding</title>
+<style>
+  :root { color-scheme: light; --ink:#17352f; --green:#0d8064; --pale:#edf8f4; --line:#cfe3dc; }
+  * { box-sizing:border-box } body { margin:0; font:16px/1.5 system-ui,sans-serif; color:var(--ink); background:#f7fbf9 }
+  main { max-width:850px; margin:7vh auto; padding:24px } h1 { font-size:clamp(2rem,6vw,4rem); line-height:1; margin:.2em 0 }
+  .lead { font-size:1.2rem; max-width:680px } .card { background:white; padding:28px; border:1px solid var(--line); border-radius:20px; box-shadow:0 15px 45px #17352f12 }
+  label { display:block; font-weight:700; margin:16px 0 6px } input[type=text] { width:100%; padding:12px; border:1px solid var(--line); border-radius:10px; font:inherit }
+  .drop { border:2px dashed #78ad9e; background:var(--pale); border-radius:16px; padding:34px; text-align:center; margin:18px 0 }
+  button,.button { display:inline-block; border:0; border-radius:12px; background:var(--green); color:white; padding:13px 20px; font-weight:750; cursor:pointer; text-decoration:none }
+  button:disabled { opacity:.5; cursor:wait } #status { white-space:pre-wrap; margin-top:18px } .muted { color:#54746b; font-size:.92rem }
+</style>
+<main>
+  <p class="muted">NU3Gen · automatická analýza</p>
+  <h1>Nanopore Metabarcoding</h1>
+  <p class="lead">Nahrajte FASTQ súbor alebo označte všetky FASTQ súbory z priečinka <b>fastq_pass</b>. Nie je potrebné ich spájať ani ZIPovať.</p>
+  <form id="form" class="card">
+    <label for="sample">Názov vzorky</label>
+    <input id="sample" name="sample" type="text" value="sample" required>
+    <div class="drop">
+      <input id="files" type="file" accept=".fastq,.gz" multiple required>
+      <p><b>Vyberte jeden alebo viac FASTQ/FASTQ.gz</b></p>
+      <p class="muted">Môžete označiť všetky súbory naraz.</p>
+    </div>
+    <button id="submit" type="submit">Analyzovať vzorku</button>
+    <p id="status" class="muted"></p>
+  </form>
+</main>
+<script>
+const form=document.querySelector('#form'), statusEl=document.querySelector('#status'), submit=document.querySelector('#submit');
+form.addEventListener('submit',async e=>{
+  e.preventDefault(); submit.disabled=true; statusEl.textContent='Nahrávam a analyzujem…';
+  const body=new FormData(); body.append('sample_name',document.querySelector('#sample').value);
+  for(const file of document.querySelector('#files').files) body.append('uploads',file,file.name);
+  try {
+    const response=await fetch('/api/analyze',{method:'POST',body}); const data=await response.json();
+    if(!response.ok) throw new Error(data.detail||'Analýza zlyhala');
+    statusEl.innerHTML=`Hotovo. Rozpoznaný marker: <b>${data.primer_detection.marker}</b> (${(100*data.primer_detection.support_fraction).toFixed(1)} % podpory).<br><br><a class="button" href="${data.report_url}">Otvoriť výsledok</a>`;
+  } catch(error) { statusEl.textContent='Chyba: '+error.message; }
+  finally { submit.disabled=false; }
+});
+</script>
+</html>
+
