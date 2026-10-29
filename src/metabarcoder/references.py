@@ -19,6 +19,8 @@ def load_reference_fasta(path: Path) -> list[ReferenceRecord]:
             accession=fields.get("accession", header.split("|")[0]),
             taxon=fields.get("taxon", "unclassified"), rank=fields.get("rank", "species"),
             marker=fields.get("marker", "unknown"), sequence="".join(sequence).upper(),
+            source=fields.get("source", "unknown"),
+            audit_level=fields.get("audit", "unreviewed"),
         ))
 
     with path.open(encoding="utf-8") as handle:
@@ -63,5 +65,6 @@ def classify(sequence: str, cluster_id: str, references: list[ReferenceRecord],
         cluster_id=cluster_id, taxon=best.taxon, rank=best.rank, accession=best.accession,
         identity=best_identity, query_coverage=coverage, margin_to_second=margin,
         assignment=assignment, confidence=confidence,
+        reference_source=best.source, audit_level=best.audit_level,
     )
 

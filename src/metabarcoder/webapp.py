@@ -15,7 +15,7 @@ from .pipeline import run_analysis
 
 ROOT = Path(__file__).resolve().parents[2]
 RESULTS_ROOT = ROOT / "results"
-REFERENCE = ROOT / "references" / "demo_cytb.fasta"
+REFERENCE = ROOT / "references" / "releases" / "nu3gen_animals_v1.fasta"
 MAX_UPLOAD_BYTES = 2 * 1024 * 1024 * 1024
 
 app = FastAPI(title="Nanopore Metabarcoding", version="0.1.0")
@@ -57,6 +57,7 @@ def analyze(sample_name: str = Form("sample"), uploads: list[UploadFile] = File(
             "taxonomy": result["taxonomy"],
             "report_url": f"/api/jobs/{job_id}/report",
             "json_url": f"/api/jobs/{job_id}/json",
+            "consensus_url": f"/api/jobs/{job_id}/consensus",
         })
     except HTTPException:
         shutil.rmtree(result_dir, ignore_errors=True)
@@ -80,4 +81,12 @@ def report_json(job_id: str):
     if not path.exists():
         raise HTTPException(404, "Výsledok neexistuje")
     return FileResponse(path, media_type="application/json", filename="report.json")
+
+
+@app.get("/api/jobs/{job_id}/consensus")
+def consensus(job_id: str):
+    path = RESULTS_ROOT / Path(job_id).name / "consensus.fasta"
+    if not path.exists():
+        raise HTTPException(404, "Konsenzuálna sekvencia neexistuje")
+    return FileResponse(path, media_type="text/plain", filename="consensus.fasta")
 

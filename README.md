@@ -15,13 +15,21 @@ vytvárať ZIP: môže nahrať jeden súbor, viac súborov alebo celý priečino
 - porovnanie reprezentantov zhlukov s lokálnou FASTA databázou,
 - konzervatívne priradenie druhu/rodu/skupiny,
 - JSON, CSV a HTML report,
+- konsenzuálne sekvencie vo FASTA a priame nezávislé overenie v NCBI BLAST nt,
+- accession, zdroj a auditná úroveň každej referenčnej zhody,
 - webový upload viacerých súborov a priečinka,
 - validačný profil L15601/H15748 pre približne 148 bp fragment MT-CYB.
 
-> Referenčná FASTA v `references/demo_cytb.fasta` je iba validačný minipanel pre
-> AMP25. Produkčné použitie vyžaduje kurátorovanú lokálnu databázu s vhodným
-> taxonomickým pokrytím. Pipeline preto výsledok z neúplného panelu označí ako
-> `provisional`, nie ako definitívnu identifikáciu.
+Webová aplikácia používa verzovaný panel
+`references/releases/nu3gen_animals_v1.fasta`. Súbor
+`references/demo_cytb.fasta` zostáva iba validačným minipanelom pre AMP25.
+Výsledok z neúplného panelu je `provisional`, nie definitívna identifikácia.
+
+Prvá produkčná databázová vrstva je definovaná v `references/`. Základ tvorí
+NCBI RefSeq; MIDORI2 a verejné BOLD záznamy možno pridať iba so zachovaným
+accessionom, taxonómiou, markerom, zdrojom a auditnou úrovňou. Builder a zoznam
+cieľových hospodárskych a voľne žijúcich druhov sú opísané v
+`references/README.md`.
 
 ## Najjednoduchší vstup
 
@@ -52,7 +60,7 @@ Otvorte <http://localhost:8000>.
 ```bash
 metabarcoder analyze \
   --input /cesta/k/fastq_pass \
-  --reference references/demo_cytb.fasta \
+  --reference references/releases/nu3gen_animals_v1.fasta \
   --output results/AMP25 \
   --sample AMP25
 ```
@@ -85,7 +93,7 @@ profily sa pridávajú až po kontrole primárneho článku.
 
 ## Produkčný plán
 
-1. doplniť kurátorovanú CYTB/COI/12S/16S databázu a LCA taxonómiu,
+1. vytvoriť a validačne uzamknúť prvé vydanie kurátorovanej CYTB/COI/12S/16S databázy,
 2. zaradiť vsearch/amplicon_sorter a robustný konsenzus,
 3. detekovať chiméry a NUMT, pri kódujúcich markeroch kontrolovať preklad,
 4. automaticky rozdeľovať barcode vzorky,
