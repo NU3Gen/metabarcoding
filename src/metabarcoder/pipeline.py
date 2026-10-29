@@ -124,14 +124,23 @@ def run_analysis(config: AnalysisConfig) -> dict:
 def write_outputs(result: dict, output_dir: Path) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
     (output_dir / "report.json").write_text(json.dumps(result, indent=2, ensure_ascii=False), encoding="utf-8")
+    with (output_dir / "consensus.fasta").open("w", encoding="utf-8") as handle:
+        for cluster in result["clusters"]:
+            handle.write(
+                f'>{result["sample"]}|{cluster["id"]}|reads={cluster["reads"]}|fraction={cluster["fraction"]:.6f}\n'
+                f'{cluster["representative"]}\n'
+            )
     with (output_dir / "species.csv").open("w", newline="", encoding="utf-8") as handle:
         writer = csv.writer(handle)
-        writer.writerow(["cluster", "reads", "fraction", "taxon", "rank", "identity", "coverage", "assignment", "confidence"])
+        writer.writerow(["cluster", "reads", "fraction", "taxon", "rank", "accession",
+                         "reference_source", "audit_level", "identity", "coverage",
+                         "assignment", "confidence"])
         clusters = {row["id"]: row for row in result["clusters"]}
         for hit in result["taxonomy"]:
             cluster = clusters[hit["cluster_id"]]
             writer.writerow([hit["cluster_id"], cluster["reads"], f'{cluster["fraction"]:.6f}',
-                             hit["taxon"], hit["rank"], f'{hit["identity"]:.6f}',
+                             hit["taxon"], hit["rank"], hit["accession"],
+                             hit["reference_source"], hit["audit_level"], f'{hit["identity"]:.6f}',
                              f'{hit["query_coverage"]:.6f}', hit["assignment"], hit["confidence"]])
     rows = []
     clusters = {row["id"]: row for row in result["clusters"]}
@@ -139,17 +148,25 @@ def write_outputs(result: dict, output_dir: Path) -> None:
         cluster = clusters[hit["cluster_id"]]
         rows.append("<tr>" + "".join(f"<td>{html.escape(str(value))}</td>" for value in (
             hit["cluster_id"], cluster["reads"], f'{cluster["fraction"]:.2%}', hit["taxon"],
+            hit["accession"], hit["reference_source"], hit["audit_level"],
             f'{hit["identity"]:.2%}', f'{hit["query_coverage"]:.2%}', hit["assignment"], hit["confidence"],
         )) + "</tr>")
+    dominant = result["clusters"][0]["representative"] if result["clusters"] else ""
     report_html = f"""<!doctype html><html lang='sk'><meta charset='utf-8'>
 <meta name='viewport' content='width=device-width,initial-scale=1'><title>Metabarcoding – {html.escape(result['sample'])}</title>
-<style>body{{font:16px system-ui;max-width:1100px;margin:40px auto;padding:0 20px;color:#17202a}}table{{border-collapse:collapse;width:100%}}th,td{{padding:10px;border-bottom:1px solid #ddd;text-align:left}}.card{{background:#f5f8fa;padding:20px;border-radius:14px;margin:18px 0}}code{{background:#eef2f4;padding:2px 5px}}</style>
+<style>body{{font:16px system-ui;max-width:1200px;margin:40px auto;padding:0 20px;color:#17202a}}table{{border-collapse:collapse;width:100%;font-size:14px}}th,td{{padding:9px;border-bottom:1px solid #ddd;text-align:left}}.card{{background:#f5f8fa;padding:20px;border-radius:14px;margin:18px 0}}code{{background:#eef2f4;padding:2px 5px}}button,.button{{display:inline-block;background:#0d8064;color:white;border:0;border-radius:10px;padding:11px 16px;font-weight:700;text-decoration:none;cursor:pointer}}</style>
 <h1>Výsledok: {html.escape(result['sample'])}</h1>
 <div class='card'><b>Marker:</b> {html.escape(result['primer_detection']['marker'])}<br>
 <b>Primer:</b> {html.escape(result['primer_detection']['name'])}<br>
 <b>Podpora detekcie:</b> {result['primer_detection']['support_fraction']:.2%}<br>
 <b>Platné inserty:</b> {result['filtering']['reads_with_valid_insert']}</div>
-<table><thead><tr><th>Zhluk</th><th>Čítania</th><th>Podiel</th><th>Taxón</th><th>Identita</th><th>Pokrytie</th><th>Priradenie</th><th>Istota</th></tr></thead><tbody>{''.join(rows)}</tbody></table>
+<p><a class='button' href='consensus'>Stiahnuť konsenzus FASTA</a></p>
+<form action='https://blast.ncbi.nlm.nih.gov/Blast.cgi' method='get' target='_blank'>
+<input type='hidden' name='PROGRAM' value='blastn'><input type='hidden' name='DATABASE' value='nt'>
+<input type='hidden' name='PAGE_TYPE' value='BlastSearch'><input type='hidden' name='QUERY' value='{html.escape(dominant)}'>
+<button type='submit'>Overiť dominantný konsenzus v celom NCBI nt</button></form>
+<p><small>NCBI nt obsahuje aj neauditované záznamy. BLAST je nezávislé externé overenie; lokálna klasifikácia uprednostňuje kurátorované referencie.</small></p>
+<table><thead><tr><th>Zhluk</th><th>Čítania</th><th>Podiel</th><th>Taxón</th><th>Accession</th><th>Zdroj</th><th>Audit</th><th>Identita</th><th>Pokrytie</th><th>Priradenie</th><th>Istota</th></tr></thead><tbody>{''.join(rows)}</tbody></table>
 <p><small>{html.escape(' '.join(result['warnings']))}</small></p></html>"""
     (output_dir / "report.html").write_text(report_html, encoding="utf-8")
 
