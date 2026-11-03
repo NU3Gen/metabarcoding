@@ -1,0 +1,23 @@
+accession	taxon	marker	primer_profile	source	audit	length
+NC_006853.1	Bos taurus	MT-CYB	cytb_l15601_h15748	NCBI RefSeq	curated	149
+NC_002008.4	Canis lupus	MT-CYB	cytb_l15601_h15748	NCBI RefSeq	curated	149
+NC_008092.1	Canis lupus	MT-CYB	cytb_l15601_h15748	NCBI RefSeq	curated	149
+NC_010340.2	Canis lupus	MT-CYB	cytb_l15601_h15748	NCBI RefSeq	curated	149
+NC_002008.4	Canis lupus familiaris	MT-CYB	cytb_l15601_h15748	NCBI RefSeq	curated	149
+NC_005044.2	Capra hircus	MT-CYB	cytb_l15601_h15748	NCBI RefSeq	curated	148
+NC_020684.1	Capreolus capreolus	MT-CYB	cytb_l15601_h15748	NCBI RefSeq	curated	148
+NC_028625.1	Castor fiber	MT-CYB	cytb_l15601_h15748	NCBI RefSeq	curated	150
+NC_007704.2	Cervus elaphus	MT-CYB	cytb_l15601_h15748	NCBI RefSeq	curated	148
+NC_013836.1	Cervus elaphus	MT-CYB	cytb_l15601_h15748	NCBI RefSeq	curated	148
+NC_020700.1	Dama dama	MT-CYB	cytb_l15601_h15748	NCBI RefSeq	curated	148
+NC_001788.1	Equus asinus	MT-CYB	cytb_l15601_h15748	NCBI RefSeq	curated	148
+X79547.1	Equus caballus	MT-CYB	cytb_l15601_h15748	NCBI GenBank	traceable	148
+NC_001913.1	Oryctolagus cuniculus	MT-CYB	cytb_l15601_h15748	NCBI RefSeq	curated	148
+NC_001941.1	Ovis aries	MT-CYB	cytb_l15601_h15748	NCBI RefSeq	curated	149
+MG489885.1	Ovis aries musimon	MT-CYB	cytb_l15601_h15748	NCBI GenBank	traceable	149
+NC_020633.1	Rupicapra rupicapra	MT-CYB	cytb_l15601_h15748	NCBI RefSeq	curated	149
+NC_000845.1	Sus scrofa	MT-CYB	cytb_l15601_h15748	NCBI RefSeq	curated	148
+NC_012095.1	Sus scrofa	MT-CYB	cytb_l15601_h15748	NCBI RefSeq	curated	148
+NC_014692.1	Sus scrofa	MT-CYB	cytb_l15601_h15748	NCBI RefSeq	curated	148
+NC_039090.1	Sus scrofa	MT-CYB	cytb_l15601_h15748	NCBI RefSeq	curated	148
+NC_003427.1	Ursus arctos	MT-CYB	cytb_l15601_h15748	NCBI RefSeq	curated	149

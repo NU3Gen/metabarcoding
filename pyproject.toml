@@ -13,6 +13,7 @@ dependencies = [
   "fastapi>=0.115,<1",
   "python-multipart>=0.0.20,<1",
   "uvicorn[standard]>=0.34,<1",
+  "biopython>=1.84,<2",
 ]
 
 [project.scripts]

@@ -70,6 +70,8 @@ class ReferenceRecord:
     rank: str
     marker: str
     sequence: str
+    source: str = "unknown"
+    audit_level: str = "unreviewed"
 
 
 @dataclass(frozen=True)
@@ -83,6 +85,8 @@ class TaxonomicHit:
     margin_to_second: float | None
     assignment: str
     confidence: str
+    reference_source: str = "unknown"
+    audit_level: str = "unreviewed"
 
 
 @dataclass

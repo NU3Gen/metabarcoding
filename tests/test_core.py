@@ -47,6 +47,10 @@ class CoreTests(unittest.TestCase):
             self.assertEqual(result["taxonomy"][0]["taxon"], "Capreolus capreolus")
             self.assertEqual(result["taxonomy"][0]["assignment"], "provisional")
             self.assertTrue((root / "results/report.html").exists())
+            self.assertTrue((root / "results/consensus.fasta").exists())
+            report = (root / "results/report.html").read_text()
+            self.assertIn("NCBI nt", report)
+            self.assertIn("Stiahnuť konsenzus FASTA", report)
 
 
 if __name__ == "__main__":

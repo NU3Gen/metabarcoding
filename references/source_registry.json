@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "sources": [
+    {
+      "id": "ncbi_refseq",
+      "name": "NCBI RefSeq",
+      "role": "primary curated reference",
+      "access": "NCBI E-utilities / NCBI Datasets",
+      "audit_level": "curated"
+    },
+    {
+      "id": "midori2",
+      "name": "MIDORI2",
+      "role": "quality-controlled mitochondrial supplement",
+      "license": "CC BY 4.0",
+      "required_metadata": ["release DOI", "INSDC accession", "taxon", "marker"],
+      "audit_level": "quality-controlled"
+    },
+    {
+      "id": "bold",
+      "name": "BOLD Systems",
+      "role": "COI and regional voucher-backed supplement",
+      "required_metadata": ["process ID or INSDC accession", "taxon", "marker", "public record status"],
+      "audit_level": "voucher-traceable"
+    },
+    {
+      "id": "ncbi_nt",
+      "name": "NCBI nucleotide collection (nt)",
+      "role": "external independent BLAST verification",
+      "audit_level": "mixed; not accepted automatically as curated"
+    }
+  ]
+}

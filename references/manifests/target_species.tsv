@@ -1,0 +1,26 @@
+scientific_name	common_name_en	group	priority	reporting_note
+Bos taurus	cattle	domestic	1	
+Sus scrofa	pig / wild boar	domestic_wild	1	Mitochondrial markers do not reliably distinguish domestic pig from wild boar.
+Ovis aries	sheep	domestic	1	
+Capra hircus	goat	domestic	1	
+Equus caballus	horse	domestic	1	
+Equus asinus	donkey	domestic	1	
+Gallus gallus	chicken	domestic	1	
+Meleagris gallopavo	turkey	domestic	1	
+Anas platyrhynchos	mallard / domestic duck	domestic_wild	1	Domestic and wild lineages may not be separable with a short marker.
+Anser anser	greylag / domestic goose	domestic_wild	1	Domestic and wild lineages may not be separable with a short marker.
+Oryctolagus cuniculus	rabbit	domestic_wild	1	
+Cervus elaphus	red deer	wild	1	
+Capreolus capreolus	roe deer	wild	1	
+Dama dama	fallow deer	wild	1	
+Ovis aries musimon	mouflon	wild	1	Current NCBI taxon name; taxonomy and introgression with domestic sheep require cautious reporting.
+Rupicapra rupicapra	chamois	wild	1	Short markers may not resolve subspecies.
+Ursus arctos	brown bear	wild	1	
+Canis lupus	wolf / dog complex	wild_domestic	1	Short mitochondrial markers may not reliably distinguish wolf from dog.
+Vulpes vulpes	red fox	wild	1	
+Lynx lynx	Eurasian lynx	wild	1	
+Lepus europaeus	European hare	wild	1	
+Castor fiber	Eurasian beaver	wild	2	
+Felis silvestris	European wildcat	wild	2	Introgression with domestic cat requires cautious reporting.
+Felis catus	domestic cat	domestic	2	Introgression with European wildcat requires cautious reporting.
+Canis lupus familiaris	dog	domestic	2	Report as Canis lupus complex unless the selected marker is validated for dog/wolf separation.
