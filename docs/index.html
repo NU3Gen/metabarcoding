@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="sk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Lokálny prototyp analýzy Nanopore metabarcoding FASTQ dát">
+  <title>NU3Gen Metabarcoding</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <div class="brand"><span class="mark">N3</span><span>NU3Gen</span></div>
+    <a href="https://github.com/NU3Gen/metabarcoding">Zdrojový kód</a>
+  </header>
+  <main>
+    <section class="hero">
+      <p class="eyebrow">NANOPORE · ANIMAL METABARCODING</p>
+      <h1>Z FASTQ dát k druhovému zloženiu vzorky</h1>
+      <p class="lead">Nahrajte nespojené súbory priamo z priečinka <b>fastq_pass</b>. Dáta zostávajú vo vašom prehliadači.</p>
+    </section>
+
+    <section class="panel" id="upload-panel">
+      <label for="sample">Názov vzorky</label>
+      <input id="sample" value="sample" autocomplete="off">
+      <label class="drop" for="files">
+        <input id="files" type="file" accept=".fastq,.fq,.fastq.gz,.fq.gz,.gz" multiple>
+        <span class="drop-title">Vyberte FASTQ alebo FASTQ.gz</span>
+        <span id="file-summary">Jeden súbor alebo viac súborov naraz · bez ZIP</span>
+      </label>
+      <div class="actions">
+        <button id="analyze" disabled>Analyzovať vzorku</button>
+        <button id="demo" class="secondary">Spustiť demo</button>
+      </div>
+      <progress id="progress" value="0" max="100" hidden></progress>
+      <p id="status" role="status"></p>
+    </section>
+
+    <section id="results" hidden>
+      <div class="result-head">
+        <div><p class="eyebrow">VÝSLEDOK</p><h2 id="result-title"></h2></div>
+        <span class="badge" id="mixed-badge"></span>
+      </div>
+      <div class="metrics" id="metrics"></div>
+      <div class="grid">
+        <article class="panel"><h3>Kategórie čítaní</h3><div id="category-chart"></div></article>
+        <article class="panel"><h3>Druhové zloženie</h3><div id="composition"></div></article>
+      </div>
+      <article class="panel table-wrap">
+        <h3>Taxonomické zhody</h3>
+        <table><thead><tr><th>Taxón</th><th>Čítania</th><th>Podiel</th><th>Accession</th><th>Identita</th><th>Zdroj</th><th>Audit</th></tr></thead><tbody id="taxa"></tbody></table>
+      </article>
+      <article class="panel">
+        <h3>Interpretácia</h3><p id="summary"></p>
+        <p class="warning">Prototyp používa lokálny panel MT-CYB pre primer L15601/H15748. Neprítomnosť zhody nie je dôkazom neprítomnosti druhu. NCBI nt obsahuje aj nekurované záznamy.</p>
+        <div class="actions wrap">
+          <button data-download="csv">Stiahnuť CSV</button>
+          <button data-download="json" class="secondary">Stiahnuť JSON</button>
+          <button data-download="fasta" class="secondary">Stiahnuť konsenzus FASTA</button>
+          <button id="blast" class="dark">Otvoriť v NCBI BLAST</button>
+        </div>
+      </article>
+    </section>
+  </main>
+  <footer>Prototyp v0.2 · analýza prebieha lokálne · NU3Gen</footer>
+  <script src="app.js" defer></script>
+</body>
+</html>
