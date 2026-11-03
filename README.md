@@ -6,6 +6,11 @@ GitHub Pages verzia analyzuje FASTQ/FASTQ.gz lokálne v prehliadači. Dáta vzor
 sa neodosielajú na server. Je určená na demonštráciu pracovného postupu a nie
 ako akreditovaný diagnostický výstup.
 
+Vstup nie je viazaný na názov súboru ani barcode. Aplikácia prijme ľubovoľný
+štandardný FASTQ/FQ, aj gzip-komprimovaný, overí jeho štruktúru a kvalitu a
+automaticky skúsi dostupné primerové profily. Nepodporovaný marker skončí
+bezpečným QC výsledkom bez vymyslenej taxonomickej identifikácie.
+
 Webová a príkazová pipeline na druhovú identifikáciu živočíchov z nezarovnaných
 Oxford Nanopore `FASTQ`/`FASTQ.gz` dát. Používateľ nemusí súbory spájať ani
 vytvárať ZIP: môže nahrať jeden súbor, viac súborov alebo celý priečinok
