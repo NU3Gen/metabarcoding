@@ -1,5 +1,11 @@
 # Nanopore Metabarcoding
 
+**Webový prototyp:** <https://nu3gen.github.io/metabarcoding/>
+
+GitHub Pages verzia analyzuje FASTQ/FASTQ.gz lokálne v prehliadači. Dáta vzorky
+sa neodosielajú na server. Je určená na demonštráciu pracovného postupu a nie
+ako akreditovaný diagnostický výstup.
+
 Webová a príkazová pipeline na druhovú identifikáciu živočíchov z nezarovnaných
 Oxford Nanopore `FASTQ`/`FASTQ.gz` dát. Používateľ nemusí súbory spájať ani
 vytvárať ZIP: môže nahrať jeden súbor, viac súborov alebo celý priečinok
