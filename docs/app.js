@@ -76,6 +76,24 @@ function classify(sequence,references){
   return {category,taxon:best.ref.taxon,accession:best.ref.accession,source:best.ref.source,audit:best.ref.audit,identity:best.identity,sequence};
 }
 
+function buildKmerIndex(references){
+  const index=new Map();
+  references.forEach((ref,refIndex)=>{for(const kmer of ref.kmers){const matches=index.get(kmer);if(matches)matches.push(refIndex);else index.set(kmer,[refIndex]);}});
+  return index;
+}
+
+function recoverLowAbundance(sequence,references,index){
+  const queryKmers=kmerSet(sequence);if(!queryKmers.size)return {category:"unassigned"};
+  const shared=new Uint16Array(references.length);
+  for(const kmer of queryKmers){const matches=index.get(kmer);if(matches)for(const refIndex of matches)shared[refIndex]++;}
+  const byTaxon=new Map();
+  references.forEach((ref,i)=>{const denominator=Math.min(queryKmers.size,ref.kmers.size),score=denominator?shared[i]/denominator:0,old=byTaxon.get(ref.taxon);if(!old||score>old.score)byTaxon.set(ref.taxon,{ref,score});});
+  const ranked=[...byTaxon.values()].sort((a,b)=>b.score-a.score),best=ranked[0],second=ranked[1];
+  if(!best||best.score<.67)return {category:"unassigned"};
+  if(second&&best.score-second.score<.03)return {category:"ambiguous"};
+  return {category:"low-confidence",taxon:best.ref.taxon,ref:best.ref,score:best.score};
+}
+
 function parseFastq(text){
   const lines=text.split(/\r?\n/),records=[];
   for(let i=0;i<lines.length;){if(!lines[i]){i++;continue;}if(i+3>=lines.length||!lines[i].startsWith("@")||!lines[i+2].startsWith("+"))throw new Error(`Neplatný alebo neúplný FASTQ záznam pri riadku ${i+1}.`);const sequence=lines[i+1].trim().toUpperCase(),quality=lines[i+3].trim();if(!/^[ACGTRYSWKMBDHVN]+$/i.test(sequence))throw new Error(`Sekvencia obsahuje neplatné znaky pri riadku ${i+2}.`);if(sequence.length!==quality.length)throw new Error(`Sekvencia a kvalita majú inú dĺžku pri riadku ${i+1}.`);const meanQ=quality.length?[...quality].reduce((n,c)=>n+c.charCodeAt(0)-33,0)/quality.length:0;records.push({sequence,meanQ});i+=4;}
@@ -105,13 +123,24 @@ async function analyzeTexts(sample,texts){
     variants.set(insert,(variants.get(insert)||0)+1);
     if(i%250===0){setStatus(`Analyzujem čítanie ${i+1} z ${records.length}…`,25+55*i/Math.max(1,records.length));await new Promise(r=>setTimeout(r,0));}
   }
-  const hits=[],rankedVariants=[...variants].sort((a,b)=>b[1]-a[1]),selectedVariants=rankedVariants.slice(0,250),deferredReads=rankedVariants.slice(250).reduce((n,row)=>n+row[1],0);counts["low-confidence"]+=deferredReads;
+  const hits=[],rankedVariants=[...variants].sort((a,b)=>b[1]-a[1]),selectedVariants=rankedVariants.slice(0,250),deferredVariants=rankedVariants.slice(250),deferredReads=deferredVariants.reduce((n,row)=>n+row[1],0);
   for(const [sequence,reads] of selectedVariants){const hit=classify(sequence,references);counts[hit.category]+=reads;if(hit.category!=="unassigned")hits.push({...hit,reads});}
   const grouped=new Map();for(const hit of hits){const key=`${hit.taxon}|${hit.accession}`;const old=grouped.get(key);if(!old||hit.identity>old.identity)grouped.set(key,{...hit,reads:(old?.reads||0)+hit.reads});else old.reads+=hit.reads;}
+  setStatus(`Dopĺňam nízko početné varianty…`,82);
+  const kmerIndex=buildKmerIndex(references),recovered=new Map();
+  for(let i=0;i<deferredVariants.length;i++){
+    const [sequence,reads]=deferredVariants[i],match=recoverLowAbundance(sequence,references,kmerIndex);counts[match.category]+=reads;
+    if(match.taxon){const old=recovered.get(match.taxon);if(!old)recovered.set(match.taxon,{reads,representative:sequence,representativeReads:reads,ref:match.ref});else{old.reads+=reads;if(reads>old.representativeReads){old.representative=sequence;old.representativeReads=reads;old.ref=match.ref;}}}
+    if(i%1000===0){setStatus(`Dopĺňam variant ${i+1} z ${deferredVariants.length}…`,82+13*i/Math.max(1,deferredVariants.length));await new Promise(r=>setTimeout(r,0));}
+  }
+  for(const [taxon,recovery] of recovered){
+    const anchor=classify(recovery.representative,references);if(anchor.taxon!==taxon)continue;
+    const key=`${anchor.taxon}|${anchor.accession}`,old=grouped.get(key);if(old)old.reads+=recovery.reads;else grouped.set(key,{...anchor,category:"low-confidence",reads:recovery.reads});
+  }
   const taxa=[...grouped.values()].sort((a,b)=>b.reads-a.reads),assignedReads=counts.assigned+counts.probable+counts["low-confidence"]+counts.ambiguous;
   taxa.forEach(x=>x.fraction=assignedReads?x.reads/assignedReads:0);
   const mixed=taxa.filter(x=>x.fraction>=.05).length>1;
-  const result={schema_version:"prototype-0.3",sample,created_at:new Date().toISOString(),marker:profile.marker,primer_profile:profile.id,primer_detection:{status:"detected",sampled:detection.sampled,hits:detection.hits,support:detection.support},total_reads:records.length,assigned_reads:assignedReads,mean_read_length:meanLength,mean_read_quality:meanQuality,unique_inserts:variants.size,classifed_variants:selectedVariants.length,deferred_low_abundance_reads:deferredReads,categories:counts,mixed_sample:mixed,taxa,dominant_consensus:taxa[0]?.sequence||"",warnings:["Výsledok je platný iba v rozsahu lokálneho referenčného panelu.","Najviac 250 najpočetnejších sekvenčných variantov sa taxonomicky klasifikuje; zvyšné nízko početné varianty sa označia ako low-confidence.","Toto je validačný prototyp, nie akreditovaná diagnostická metóda."]};
+  const result={schema_version:"prototype-0.4",sample,created_at:new Date().toISOString(),marker:profile.marker,primer_profile:profile.id,primer_detection:{status:"detected",sampled:detection.sampled,hits:detection.hits,support:detection.support},total_reads:records.length,assigned_reads:assignedReads,mean_read_length:meanLength,mean_read_quality:meanQuality,unique_inserts:variants.size,classified_variants:selectedVariants.length,recovered_low_abundance_reads:[...recovered.values()].reduce((n,row)=>n+row.reads,0),deferred_low_abundance_reads:deferredReads,categories:counts,mixed_sample:mixed,taxa,dominant_consensus:taxa[0]?.sequence||"",warnings:["Výsledok je platný iba v rozsahu lokálneho referenčného panelu.","Najpočetnejšie varianty sa klasifikujú presnou podobnosťou; nízko početné varianty sa dopĺňajú konzervatívnym k-mer porovnaním a uvádzajú sa ako low-confidence.","Toto je validačný prototyp, nie akreditovaná diagnostická metóda."]};
   setStatus("Analýza je dokončená.",100);return result;
 }
 
